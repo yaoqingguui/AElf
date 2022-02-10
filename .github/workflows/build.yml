@@ -41,6 +41,5 @@ jobs:
         shell: powershell
         run: |
           .\.sonar\scanner\dotnet-sonarscanner begin /k:"yaoqingguui_AElf" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="${{ secrets.SONAR_HOST_URL }}"
-          dotnet restore -s "https://nuget.cdn.azure.cn/v3/index.json" -s "https://api.nuget.org/v3/index.json" -v quiet "AElf.sln"
-          dotnet build /clp:ErrorsOnly /p:GeneratePackageOnBuild=false -v quiet "AElf.sln"
+          dotnet publish AElf.sln /p:NoBuild=false --configuration Release
           .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
