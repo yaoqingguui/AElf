@@ -2,13 +2,15 @@ name: Build
 on:
   push:
     branches:
-      - dev # or the name of your main branch
+      - dev
 
 jobs:
   build:
     name: Build
     runs-on: windows-latest
     steps:
+      - name: Install Protoc
+        uses: arduino/setup-protoc@v1
       - name: Set up JDK 11
         uses: actions/setup-java@v1
         with:
@@ -35,11 +37,12 @@ jobs:
         run: |
           New-Item -Path .\.sonar\scanner -ItemType Directory
           dotnet tool update dotnet-sonarscanner --tool-path .\.sonar\scanner
-      - name: Build and analyze
+      - name: Build and analyze 
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
         shell: powershell
         run: |
-          .\.sonar\scanner\dotnet-sonarscanner begin /k:"yaoqingguui_AElf" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="${{ secrets.SONAR_HOST_URL }}"
-          dotnet publish AElf.sln /p:NoBuild=false --configuration Release
+          .\.sonar\scanner\dotnet-sonarscanner begin /k:"wikiluo_AElf" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="${{ secrets.SONAR_HOST_URL }}"
+          dotnet restore -s "https://nuget.cdn.azure.cn/v3/index.json" -s "https://api.nuget.org/v3/index.json" -v quiet "AElf.sln"
+          dotnet build /clp:ErrorsOnly /p:GeneratePackageOnBuild=false -v quiet "AElf.sln"
           .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
